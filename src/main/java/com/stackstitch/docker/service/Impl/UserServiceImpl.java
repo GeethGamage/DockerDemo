@@ -3,6 +3,7 @@ package com.stackstitch.docker.service.Impl;
 import com.stackstitch.docker.entity.User;
 import com.stackstitch.docker.repository.UserRepository;
 import com.stackstitch.docker.service.UserService;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
+@Log4j2
 public class UserServiceImpl implements UserService {
 
     @Autowired
@@ -23,7 +25,7 @@ public class UserServiceImpl implements UserService {
             List<User> userList = userRepository.findAll();
             return ResponseEntity.status(HttpStatus.OK).body(userList);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error(ex.getMessage());
             throw ex;
         }
     }
@@ -33,7 +35,7 @@ public class UserServiceImpl implements UserService {
             userRepository.save(user);
             return ResponseEntity.status(HttpStatus.OK).body("User Added Successfully");
         }catch(Exception ex){
-            ex.printStackTrace();
+            log.error(ex.getMessage());
             throw ex;
         }
     }
@@ -49,7 +51,7 @@ public class UserServiceImpl implements UserService {
             }
 
         }catch(Exception ex){
-            ex.printStackTrace();
+            log.error(ex.getMessage());
             throw ex;
         }
     }
