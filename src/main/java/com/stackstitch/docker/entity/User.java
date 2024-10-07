@@ -5,7 +5,20 @@ import lombok.Data;
 
 @Data
 @Entity
+@Table(name = "User")
 public class User {
+
+    public User(){
+
+    }
+
+    public User(Long id, String firstName, String lastName, String address, String telephoneNo){
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.address = address;
+        this.telephoneNo = telephoneNo;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

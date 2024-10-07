@@ -1,6 +1,9 @@
 package com.stackstitch.docker.service.Impl;
 
+import com.stackstitch.docker.dto.UserDto;
 import com.stackstitch.docker.entity.User;
+import com.stackstitch.docker.mapper.DtoToEntity;
+import com.stackstitch.docker.mapper.EntityToDto;
 import com.stackstitch.docker.repository.UserRepository;
 import com.stackstitch.docker.service.UserService;
 import lombok.extern.log4j.Log4j2;
@@ -11,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @Log4j2
@@ -22,7 +26,8 @@ public class UserServiceImpl implements UserService {
 
     public ResponseEntity<Object> getUsers() {
         try {
-            List<User> userList = userRepository.findAll();
+            List<UserDto> userList = userRepository.findAll().stream()
+                    .map(EntityToDto::mapUserToUserDto).collect(Collectors.toList());
             return ResponseEntity.status(HttpStatus.OK).body(userList);
         } catch (Exception ex) {
             log.error(ex.getMessage());
@@ -30,9 +35,9 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public ResponseEntity<Object> addUser(User user){
+    public ResponseEntity<Object> addUser(UserDto userDto){
         try{
-            userRepository.save(user);
+            userRepository.save(DtoToEntity.mapUserDtoToUser(userDto));
             return ResponseEntity.status(HttpStatus.OK).body("User Added Successfully");
         }catch(Exception ex){
             log.error(ex.getMessage());

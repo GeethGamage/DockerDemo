@@ -1,5 +1,6 @@
 package com.stackstitch.docker.controller;
 
+import com.stackstitch.docker.dto.UserDto;
 import com.stackstitch.docker.entity.User;
 import com.stackstitch.docker.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +20,8 @@ public class UserController {
     }
 
     @PostMapping("/addUser")
-    public ResponseEntity<Object> addUser(@RequestBody User user){
-        return userService.addUser(user);
+    public ResponseEntity<Object> addUser(@RequestBody UserDto userDto){
+        return userService.addUser(userDto);
     }
 
     @DeleteMapping("/removeUser/{id}")
