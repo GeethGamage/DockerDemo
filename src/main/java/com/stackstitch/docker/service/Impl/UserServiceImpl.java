@@ -24,6 +24,23 @@ public class UserServiceImpl implements UserService {
     UserRepository userRepository;
 
 
+    public ResponseEntity<Object> getUserById(Long id)  {
+        try {
+            Optional<User> user = userRepository.findById(id);
+            if (user.isPresent()) {
+                UserDto userDto = EntityToDto.mapUserToUserDto(user.get());
+                return ResponseEntity.status(HttpStatus.OK).body(userDto);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User id not found");
+            }
+
+
+        } catch (Exception ex) {
+            log.error(ex.getMessage());
+            throw ex;
+        }
+    }
+
     public ResponseEntity<Object> getUsers() {
         try {
             List<UserDto> userList = userRepository.findAll().stream()
@@ -35,27 +52,27 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public ResponseEntity<Object> addUser(UserDto userDto){
-        try{
+    public ResponseEntity<Object> addUser(UserDto userDto) {
+        try {
             userRepository.save(DtoToEntity.mapUserDtoToUser(userDto));
             return ResponseEntity.status(HttpStatus.OK).body("User Added Successfully");
-        }catch(Exception ex){
+        } catch (Exception ex) {
             log.error(ex.getMessage());
             throw ex;
         }
     }
 
-    public ResponseEntity<Object> deleteUser(Long id){
-        try{
+    public ResponseEntity<Object> deleteUser(Long id) {
+        try {
             Optional<User> user = userRepository.findById(id);
-            if(user.isPresent()){
+            if (user.isPresent()) {
                 userRepository.delete(user.get());
                 return ResponseEntity.status(HttpStatus.OK).body("User Deleted Successfully");
-            }else{
+            } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User id not found");
             }
 
-        }catch(Exception ex){
+        } catch (Exception ex) {
             log.error(ex.getMessage());
             throw ex;
         }

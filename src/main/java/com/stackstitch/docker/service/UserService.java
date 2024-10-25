@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 
 public interface UserService {
 
+    ResponseEntity<Object> getUserById(Long id);
+
     public ResponseEntity<Object> getUsers();
 
     public ResponseEntity<Object> addUser(UserDto userDto);

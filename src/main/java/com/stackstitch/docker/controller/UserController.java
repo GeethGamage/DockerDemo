@@ -14,6 +14,11 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    @GetMapping("/getUsers/{id}")
+    public ResponseEntity<Object> getUserByID(@PathVariable Long id){
+        return userService.getUserById(id);
+    }
+
     @GetMapping("/getUsers")
     public ResponseEntity<Object> getUsers(){
         return userService.getUsers();
