@@ -49,4 +49,16 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
     }
+
+    @Test
+    public void testDeleteUser() throws Exception {
+        Mockito.when(userService.deleteUser(1L)).thenReturn(ResponseEntity.status(HttpStatus.OK).body("User Deleted Successfully"));
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/removeUser/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+    }
+
+
 }
