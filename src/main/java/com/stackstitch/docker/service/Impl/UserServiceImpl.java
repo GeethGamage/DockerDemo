@@ -2,6 +2,7 @@ package com.stackstitch.docker.service.Impl;
 
 import com.stackstitch.docker.dto.UserDto;
 import com.stackstitch.docker.entity.User;
+import com.stackstitch.docker.exception.CustomException;
 import com.stackstitch.docker.mapper.DtoToEntity;
 import com.stackstitch.docker.mapper.EntityToDto;
 import com.stackstitch.docker.repository.UserRepository;
@@ -24,54 +25,40 @@ public class UserServiceImpl implements UserService {
     UserRepository userRepository;
 
 
-    public ResponseEntity<Object> getUserById(Long id)  {
+    public UserDto getUserById(Long id)  {
         try {
-            Optional<User> user = userRepository.findById(id);
-            if (user.isPresent()) {
-                UserDto userDto = EntityToDto.mapUserToUserDto(user.get());
-                return ResponseEntity.status(HttpStatus.OK).body(userDto);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User id not found");
-            }
-
-
+            User user = userRepository.findById(id).orElseThrow(()-> new CustomException("User Not Found"));
+            return EntityToDto.mapUserToUserDto(user);
         } catch (Exception ex) {
             log.error(ex.getMessage());
             throw ex;
         }
     }
 
-    public ResponseEntity<Object> getUsers() {
+    public List<UserDto> getUsers() {
         try {
-            List<UserDto> userList = userRepository.findAll().stream()
+            return userRepository.findAll().stream()
                     .map(EntityToDto::mapUserToUserDto).collect(Collectors.toList());
-            return ResponseEntity.status(HttpStatus.OK).body(userList);
         } catch (Exception ex) {
             log.error(ex.getMessage());
             throw ex;
         }
     }
 
-    public ResponseEntity<Object> addUser(UserDto userDto) {
+    public UserDto addUser(UserDto userDto) {
         try {
-            userRepository.save(DtoToEntity.mapUserDtoToUser(userDto));
-            return ResponseEntity.status(HttpStatus.OK).body("User Added Successfully");
+            User user = userRepository.save(DtoToEntity.mapUserDtoToUser(userDto));
+            return EntityToDto.mapUserToUserDto(user);
         } catch (Exception ex) {
             log.error(ex.getMessage());
             throw ex;
         }
     }
 
-    public ResponseEntity<Object> deleteUser(Long id) {
+    public void deleteUser(Long id) {
         try {
-            Optional<User> user = userRepository.findById(id);
-            if (user.isPresent()) {
-                userRepository.delete(user.get());
-                return ResponseEntity.status(HttpStatus.OK).body("User Deleted Successfully");
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User id not found");
-            }
-
+            User user = userRepository.findById(id).orElseThrow(() -> new CustomException("User id not found"));
+            userRepository.delete(user);
         } catch (Exception ex) {
             log.error(ex.getMessage());
             throw ex;
