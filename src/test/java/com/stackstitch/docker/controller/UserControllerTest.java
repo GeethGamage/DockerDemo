@@ -9,16 +9,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -31,10 +32,10 @@ public class UserControllerTest {
     @MockBean
     UserService userService;
 
-    private  UserDto userDto;
+    private UserDto userDto;
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
         userDto = UserDto.builder()
                 .id(1L)
                 .firstName("Geeth")
@@ -44,55 +45,89 @@ public class UserControllerTest {
                 .build();
     }
 
-//    @Test
-//    public void testGetAllUsers(){
-//        List<UserDto> userDtoList = new ArrayList<>();
-//        userDtoList.add(userDto);
-//        Mockito.when(userService.getUsers()).thenReturn(ResponseEntity.st);
-//
-//    }
+    @Test
+    public void testGetAllUsers() throws Exception {
+
+        //Precondition
+        List<UserDto> userDtoList = new ArrayList<>();
+        userDtoList.add(userDto);
+        Mockito.when(userService.getUsers()).thenReturn(userDtoList);
+
+        //Action
+        ResultActions result = mockMvc.perform(get("/api/user"));
+
+        //verify
+        result.andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.size()").value(1))
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].firstName").value("Geeth"))
+                .andExpect(jsonPath("$[0].lastName").value("Gamage"))
+                .andExpect(jsonPath("$[0].address").value("Helsingborg, Sweden"))
+                .andExpect(jsonPath("$[0].telephoneNo").value("0720400780"));
+
+    }
 
     @Test
     public void testGetUserById() throws Exception {
-//        UserDto mockUser = new UserDto(1L, "Geeth", "Gamage", "Helsingborg, Sweden", "0720400780");
-//        Mockito.when(userService.getUserById(1L)).thenReturn(ResponseEntity.status(HttpStatus.OK).body(mockUser));
-        ResultActions result = mockMvc.perform(get("/user/getUsers/{id}", 2));
 
+        //Precondition
+        Mockito.when(userService.getUserById(1L)).thenReturn(userDto);
+
+        //action
+        ResultActions result = mockMvc.perform(get("/api/user/{id}", 1));
+
+        //verify
         result.andExpect(status().isOk())
-                //.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(2))
+                .andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.firstName").value("Geeth"))
                 .andExpect(jsonPath("$.lastName").value("Gamage"))
                 .andExpect(jsonPath("$.address").value("Helsingborg, Sweden"))
                 .andExpect(jsonPath("$.telephoneNo").value("0720400780"));
-
     }
 
     @Test
     public void testAddUser() throws Exception {
 
+        //Precondition
+        Mockito.when(userService.addUser(any(UserDto.class))).thenReturn(userDto);
 
         String json = """
                 {
+                  "id" : 1,
                   "firstName": "Geeth",
                   "lastName": "Gamage",
                   "address": "Helsingborg,Sweden",
                   "telephoneNo": "0770836675"
                 }
                 """;
-        mockMvc.perform(MockMvcRequestBuilders.post("/user/addUser")
-                        .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-                .andExpect(status().isOk());
+        //action
+        ResultActions result = mockMvc.perform(post("/api/user")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json));
 
+        //verify
+        result.andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.id").value(userDto.getId()))
+                .andExpect(jsonPath("$.firstName").value(userDto.getFirstName()))
+                .andExpect(jsonPath("$.lastName").value(userDto.getLastName()))
+                .andExpect(jsonPath("$.address").value(userDto.getAddress()))
+                .andExpect(jsonPath("$.telephoneNo").value(userDto.getTelephoneNo()));
     }
 
     @Test
     public void testDeleteUser() throws Exception {
-        //Mockito.when(userService.deleteUser(1L)).thenReturn(ResponseEntity.status(HttpStatus.OK).body("User Deleted Successfully"));
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/user/removeUser/{id}", 1L))
-                .andExpect(status().isOk());
+
+        //Action
+        ResultActions result = mockMvc.perform
+                (MockMvcRequestBuilders.delete("/api/user/{id}", 1L));
+        //Verify
+        result.andExpect(status().isOk())
+                .andDo(print());
     }
 
 
