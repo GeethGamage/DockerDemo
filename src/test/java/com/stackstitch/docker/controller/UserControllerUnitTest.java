@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @WebMvcTest(UserController.class)
-public class UserControllerTest {
+public class UserControllerUnitTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -52,6 +52,7 @@ public class UserControllerTest {
         List<UserDto> userDtoList = new ArrayList<>();
         userDtoList.add(userDto);
         Mockito.when(userService.getUsers()).thenReturn(userDtoList);
+// Or thenThrow()
 
         //Action
         ResultActions result = mockMvc.perform(get("/api/user"));
