@@ -52,7 +52,7 @@ public class UserControllerUnitTest {
         List<UserDto> userDtoList = new ArrayList<>();
         userDtoList.add(userDto);
         Mockito.when(userService.getUsers()).thenReturn(userDtoList);
-// Or thenThrow()
+        // Or thenThrow()
 
         //Action
         ResultActions result = mockMvc.perform(get("/api/user"));

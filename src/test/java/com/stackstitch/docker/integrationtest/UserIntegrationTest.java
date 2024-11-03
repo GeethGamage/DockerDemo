@@ -54,7 +54,8 @@ public class UserIntegrationTest {
     public void testUsersList() {
         HttpEntity<String> entity = new HttpEntity<>(null, headers);
         ResponseEntity<List<User>> response = restTemplate.exchange(
-                createURLWithPort(), HttpMethod.GET, entity, new ParameterizedTypeReference<>(){});
+                createURLWithPort(), HttpMethod.GET, entity, new ParameterizedTypeReference<>() {
+                });
         List<User> userList = response.getBody();
         assertThat(userList).isNotNull();
         assertEquals(response.getStatusCode(), HttpStatus.OK);
@@ -70,19 +71,11 @@ public class UserIntegrationTest {
         ResponseEntity<UserDto> response = restTemplate.exchange(
                 createURLWithPort() + "/22", HttpMethod.GET, entity, UserDto.class);
         UserDto user = response.getBody();
-        String json = """
-                {"id":22,\
-                "firstName":"Geeth",\
-                "lastName":"Gamage",\
-                "address":"Sweden",\
-                "telephoneNo":"0112192982"}
-                """;
-        //assertEquals(json, objectMapper.writeValueAsString(user));
         assertThat(user).isNotNull();
         assertEquals(response.getStatusCode(), HttpStatus.OK);
         assertEquals(user, userService.getUserById(22L));
         assertEquals(user.getFirstName(), userService.getUserById(22L).getFirstName());
-        assertEquals(user, userRepository.findById(22L).orElse(null));
+        assertEquals(DtoToEntity.mapUserDtoToUser(user), userRepository.findById(22L).orElse(null));
     }
 
 
@@ -93,11 +86,11 @@ public class UserIntegrationTest {
         HttpEntity<String> entity = new HttpEntity<>(objectMapper.writeValueAsString(userDto), headers);
 
         ResponseEntity<UserDto> response = restTemplate.exchange(
-                createURLWithPort() , HttpMethod.POST, entity, UserDto.class);
+                createURLWithPort(), HttpMethod.POST, entity, UserDto.class);
         UserDto user = response.getBody();
         assertThat(user).isNotNull();
         assertEquals(response.getStatusCode(), HttpStatus.OK);
-    //    assertEquals(user, userService.addUser(userDto));
+        //    assertEquals(user, userService.addUser(userDto));
         assertEquals(user.getFirstName(), userService.addUser(userDto).getFirstName());
         assertEquals(user.getFirstName(), userRepository.save(DtoToEntity.mapUserDtoToUser(userDto)).getFirstName());
     }
@@ -115,8 +108,6 @@ public class UserIntegrationTest {
         assertNotNull(userRes);
         assertEquals(userRes, "User Deleted Successfully");
     }
-
-
 
 
     private String createURLWithPort() {
