@@ -6,15 +6,15 @@ import com.stackstitch.docker.exception.CustomException;
 import com.stackstitch.docker.mapper.DtoToEntity;
 import com.stackstitch.docker.mapper.EntityToDto;
 import com.stackstitch.docker.repository.UserRepository;
+import com.stackstitch.docker.service.MathOperation;
 import com.stackstitch.docker.service.UserService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Component
@@ -25,9 +25,20 @@ public class UserServiceImpl implements UserService {
     UserRepository userRepository;
 
 
-    public UserDto getUserById(Long id)  {
+
+
+    public UserDto getUserById(Long id) {
         try {
-            User user = userRepository.findById(id).orElseThrow(()-> new CustomException("User Not Found"));
+            MathOperation add = (a,b) -> a + b;
+            MathOperation mul = (a,b) -> a * b;
+
+            int x = add.operate(10 , 20);
+
+            CompletableFuture<User> s = CompletableFuture.supplyAsync(() -> {
+                return userRepository.findById(id).orElseThrow(() -> new CustomException("User Not Found"));
+            });
+            CompletableFuture<Void> dto = s.thenAccept(result -> EntityToDto.mapUserToUserDto(result));
+            User user = userRepository.findById(id).orElseThrow(() -> new CustomException("User Not Found"));
             return EntityToDto.mapUserToUserDto(user);
         } catch (Exception ex) {
             log.error(ex.getMessage());
