@@ -32,6 +32,7 @@ public class UserServiceImpl implements UserService {
             MathOperation add = (a,b) -> a + b;
             MathOperation mul = (a,b) -> a * b;
 
+
             int x = add.operate(10 , 20);
 
             CompletableFuture<User> s = CompletableFuture.supplyAsync(() -> {

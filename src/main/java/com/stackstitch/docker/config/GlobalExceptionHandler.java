@@ -1,4 +1,4 @@
-package com.stackstitch.docker.controller;
+package com.stackstitch.docker.config;
 
 import com.stackstitch.docker.dto.ErrorDetails;
 import com.stackstitch.docker.exception.CustomException;
